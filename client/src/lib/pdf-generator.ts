@@ -25,13 +25,13 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   pdf.setFontSize(28);
   pdf.setFont(undefined, 'bold');
   pdf.setTextColor(37, 99, 235); // Primary blue
-  pdf.text('INVOICE', pageWidth - margin - 45, currentY + 5);
+  pdf.text(('INVOICE'), pageWidth - margin - 45, currentY + 5);
   
   // Company name with better styling
   pdf.setFontSize(20);
   pdf.setFont(undefined, 'bold');
   pdf.setTextColor(0, 0, 0);
-  pdf.text(data.companyName || 'Your Company', margin, currentY + 5);
+  pdf.text((data.companyName || 'Your Company'), margin, currentY + 5);
   currentY += 15;
 
   // Company details
@@ -114,9 +114,9 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   pdf.setFontSize(11);
   pdf.setFont(undefined, 'bold');
   pdf.setTextColor(255, 255, 255);
-  pdf.text('Description', colX[0] + 2, currentY + 6);
-  pdf.text('Qty', colX[1] + 2, currentY + 6);
-  pdf.text('Total Amount', colX[2] + 2, currentY + 6);
+  pdf.text(('Description'), colX[0] + 2, currentY + 6);
+  pdf.text(('Qty'), colX[1] + 2, currentY + 6);
+  pdf.text(('Total Amount'), colX[2] + 2, currentY + 6);
   
   currentY += 10;
 
@@ -124,7 +124,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   const formatCurrency = (amount: string | number) => {
     const num = typeof amount === 'string' ? parseFloat(amount) : amount;
     if (isNaN(num)) return "0.00";
-    return num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
   if (data.items && data.items.length > 0) {
@@ -145,19 +145,19 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
       // Title (bold)
       pdf.setFont(undefined, 'bold');
       pdf.setTextColor(0, 0, 0);
-      pdf.text(titleText, colX[0] + 2, currentY + 5);
+      pdf.text(titleText || '', colX[0] + 2, currentY + 5);
       
       // Description (normal font, smaller)
       if (descriptionText) {
         pdf.setFont(undefined, 'normal');
         pdf.setFontSize(8);
-        pdf.text(descriptionText, colX[0] + 2, currentY + 9);
+        pdf.text(descriptionText || '', colX[0] + 2, currentY + 9);
         pdf.setFontSize(10); // Reset font size
       }
       
       // Reset font to normal for other columns
       pdf.setFont(undefined, 'normal');
-      pdf.text(item.quantity.toString(), colX[1] + 2, currentY + 5);
+      pdf.text((item.quantity || 1).toString(), colX[1] + 2, currentY + 5);
       const lineTotal = (item.amount || 0) * (item.quantity || 1);
       pdf.text(`₹${formatCurrency(lineTotal)}`, colX[2] + 2, currentY + 5);
       
