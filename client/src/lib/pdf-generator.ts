@@ -102,23 +102,29 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
 
   currentY = Math.max(currentY, billToY) + 20;
 
-  // Items table
+  // Items table with clean layout
   const tableStartY = currentY;
-  const colWidths = [110, 20, 30];
+  const tableWidth = pageWidth - 2 * margin;
+  const colWidths = [tableWidth * 0.65, tableWidth * 0.15, tableWidth * 0.2]; // Description 65%, Qty 15%, Amount 20%
   const colX = [margin, margin + colWidths[0], margin + colWidths[0] + colWidths[1]];
 
-  // Table header with better styling
-  pdf.setFillColor(37, 99, 235);
-  pdf.rect(margin, currentY, pageWidth - 2 * margin, 10, 'F');
+  // Table header with clean styling
+  pdf.setFillColor(248, 248, 248); // Light gray background
+  pdf.rect(margin, currentY, tableWidth, 12, 'F');
   
-  pdf.setFontSize(11);
+  // Header borders
+  pdf.setDrawColor(200, 200, 200);
+  pdf.setLineWidth(0.5);
+  pdf.rect(margin, currentY, tableWidth, 12);
+  
+  pdf.setFontSize(12);
   pdf.setFont(undefined, 'bold');
-  pdf.setTextColor(255, 255, 255);
-  pdf.text(('Description'), colX[0] + 2, currentY + 6);
-  pdf.text(('Qty'), colX[1] + 2, currentY + 6);
-  pdf.text(('Total Amount'), colX[2] + 2, currentY + 6);
+  pdf.setTextColor(0, 0, 0);
+  pdf.text('Description', colX[0] + 5, currentY + 8);
+  pdf.text('Qty', colX[1] + 5, currentY + 8);
+  pdf.text('Amount', colX[2] + 5, currentY + 8);
   
-  currentY += 10;
+  currentY += 12;
 
   // Table rows
   const formatCurrency = (amount: string | number) => {
@@ -128,75 +134,113 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   };
 
   if (data.items && data.items.length > 0) {
-    data.items.forEach((item) => {
-      // Add border
-      pdf.setDrawColor(200, 200, 200);
-      pdf.line(margin, currentY, pageWidth - margin, currentY);
-      
-      let rowHeight = 8;
+    data.items.forEach((item, index) => {
       const titleText = item.title || '';
       const descriptionText = item.description || '';
       
-      // Calculate height needed for title and description
-      if (descriptionText) {
-        rowHeight = 12; // Increased for two lines
+      // Calculate row height based on content
+      let rowHeight = 20; // Base height
+      if (descriptionText && descriptionText.length > 50) {
+        rowHeight = 30; // Extra height for long descriptions
       }
       
-      // Title (bold)
-      pdf.setFont(undefined, 'bold');
-      pdf.setTextColor(0, 0, 0);
-      pdf.text(titleText || '', colX[0] + 2, currentY + 5);
+      // Alternate row background
+      if (index % 2 === 1) {
+        pdf.setFillColor(252, 252, 252);
+        pdf.rect(margin, currentY, tableWidth, rowHeight, 'F');
+      }
       
-      // Description (normal font, smaller)
+      // Row borders
+      pdf.setDrawColor(230, 230, 230);
+      pdf.setLineWidth(0.3);
+      pdf.rect(margin, currentY, tableWidth, rowHeight);
+      
+      // Title (bold, larger)
+      pdf.setFont(undefined, 'bold');
+      pdf.setFontSize(11);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(titleText || '', colX[0] + 5, currentY + 10);
+      
+      // Description (normal font, smaller, gray)
       if (descriptionText) {
         pdf.setFont(undefined, 'normal');
-        pdf.setFontSize(8);
-        pdf.text(descriptionText || '', colX[0] + 2, currentY + 9);
-        pdf.setFontSize(10); // Reset font size
+        pdf.setFontSize(9);
+        pdf.setTextColor(80, 80, 80);
+        const descLines = pdf.splitTextToSize(descriptionText, colWidths[0] - 10);
+        pdf.text(descLines, colX[0] + 5, currentY + 16);
       }
       
-      // Reset font to normal for other columns
+      // Quantity (centered)
       pdf.setFont(undefined, 'normal');
-      pdf.text((item.quantity || 1).toString(), colX[1] + 2, currentY + 5);
+      pdf.setFontSize(11);
+      pdf.setTextColor(0, 0, 0);
+      const qtyText = (item.quantity || 1).toString();
+      const qtyWidth = pdf.getTextWidth(qtyText);
+      pdf.text(qtyText, colX[1] + (colWidths[1] - qtyWidth) / 2, currentY + 10);
+      
+      // Amount (right-aligned)
       const lineTotal = (item.amount || 0) * (item.quantity || 1);
-      pdf.text(`₹${formatCurrency(lineTotal)}`, colX[2] + 2, currentY + 5);
+      const amountText = `₹${formatCurrency(lineTotal)}`;
+      const amountWidth = pdf.getTextWidth(amountText);
+      pdf.text(amountText, colX[2] + colWidths[2] - amountWidth - 5, currentY + 10);
       
       currentY += rowHeight;
     });
   }
 
-  // Bottom border
+  // Table bottom border
+  pdf.setDrawColor(200, 200, 200);
+  pdf.setLineWidth(0.5);
   pdf.line(margin, currentY, pageWidth - margin, currentY);
-  currentY += 15;
+  currentY += 20;
 
-  // Totals section
-  const totalsX = pageWidth - margin - 60;
+  // Totals section with clean layout
+  const totalsWidth = 120;
+  const totalsX = pageWidth - margin - totalsWidth;
   
-  pdf.setFontSize(10);
-  if (data.subtotal) {
-    pdf.text('Subtotal:', totalsX - 30, currentY);
-    pdf.text(`₹${formatCurrency(data.subtotal)}`, totalsX, currentY);
-    currentY += 6;
+  // Subtotal
+  if (data.subtotal && parseFloat(data.subtotal) > 0) {
+    pdf.setFontSize(11);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text('Subtotal:', totalsX, currentY);
+    const subtotalAmount = `₹${formatCurrency(data.subtotal)}`;
+    const subtotalWidth = pdf.getTextWidth(subtotalAmount);
+    pdf.text(subtotalAmount, pageWidth - margin - subtotalWidth, currentY);
+    currentY += 8;
   }
   
+  // Tax
   if (data.taxRate && parseFloat(data.taxRate) > 0) {
-    pdf.text(`Tax (${data.taxRate}%):`, totalsX - 30, currentY);
-    pdf.text(`₹${formatCurrency(data.taxAmount || 0)}`, totalsX, currentY);
-    currentY += 6;
+    pdf.text(`Tax (${data.taxRate}%):`, totalsX, currentY);
+    const taxAmount = `₹${formatCurrency(data.taxAmount || 0)}`;
+    const taxWidth = pdf.getTextWidth(taxAmount);
+    pdf.text(taxAmount, pageWidth - margin - taxWidth, currentY);
+    currentY += 8;
   }
   
+  // Discount
   if (data.discountAmount && parseFloat(data.discountAmount) > 0) {
-    pdf.text('Discount:', totalsX - 30, currentY);
-    pdf.text(`-₹${formatCurrency(data.discountAmount)}`, totalsX, currentY);
-    currentY += 6;
+    pdf.text('Discount:', totalsX, currentY);
+    const discountAmount = `-₹${formatCurrency(data.discountAmount)}`;
+    const discountWidth = pdf.getTextWidth(discountAmount);
+    pdf.text(discountAmount, pageWidth - margin - discountWidth, currentY);
+    currentY += 8;
   }
   
-  // Total
-  pdf.setFontSize(12);
+  // Total with blue highlight
+  pdf.setDrawColor(37, 99, 235);
+  pdf.setLineWidth(1);
+  pdf.line(totalsX, currentY, pageWidth - margin, currentY);
+  currentY += 5;
+  
+  pdf.setFontSize(14);
+  pdf.setFont(undefined, 'bold');
   pdf.setTextColor(37, 99, 235);
-  pdf.text('Total:', totalsX - 30, currentY);
-  pdf.text(`₹${formatCurrency(data.total || 0)}`, totalsX, currentY);
-  currentY += 15;
+  pdf.text('Total:', totalsX, currentY);
+  const totalAmount = `₹${formatCurrency(data.total || 0)}`;
+  const totalWidth = pdf.getTextWidth(totalAmount);
+  pdf.text(totalAmount, pageWidth - margin - totalWidth, currentY);
+  currentY += 20;
 
   // Payment information
   if (data.bankAccount || data.ifscCode || data.upiId) {
