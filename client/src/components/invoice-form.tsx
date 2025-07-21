@@ -54,6 +54,7 @@ export default function InvoiceForm({
 
   const addItem = () => {
     const newItem: InvoiceItem = {
+      title: "",
       description: "",
       quantity: 1,
       rate: 0,
@@ -325,53 +326,68 @@ export default function InvoiceForm({
             <div className="space-y-4">
               {(form.watch("items") || []).map((item, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-                    <div className="md:col-span-5">
-                      <Label>Description *</Label>
-                      <Input
-                        placeholder="Service or product description"
-                        value={item.description}
-                        onChange={(e) => updateItem(index, "description", e.target.value)}
-                      />
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Title *</Label>
+                        <Input
+                          placeholder="Service or product title"
+                          value={item.title || ""}
+                          onChange={(e) => updateItem(index, "title", e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label>Description</Label>
+                        <Input
+                          placeholder="Additional details (optional)"
+                          value={item.description || ""}
+                          onChange={(e) => updateItem(index, "description", e.target.value)}
+                        />
+                      </div>
                     </div>
-                    <div className="md:col-span-2">
-                      <Label>Quantity</Label>
-                      <Input
-                        type="number"
-                        min="1"
-                        value={item.quantity}
-                        onChange={(e) => updateItem(index, "quantity", Number(e.target.value))}
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <Label>Rate</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={item.rate}
-                        onChange={(e) => updateItem(index, "rate", Number(e.target.value))}
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <Label>Amount</Label>
-                      <Input
-                        type="text"
-                        value={item.amount.toFixed(2)}
-                        readOnly
-                        className="bg-gray-50 text-gray-600"
-                      />
-                    </div>
-                    <div className="md:col-span-1">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeItem(index)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                      <div className="md:col-span-5">
+                        {/* Spacer for layout */}
+                      </div>
+                      <div className="md:col-span-2">
+                        <Label>Quantity</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={item.quantity}
+                          onChange={(e) => updateItem(index, "quantity", Number(e.target.value))}
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <Label>Rate</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={item.rate}
+                          onChange={(e) => updateItem(index, "rate", Number(e.target.value))}
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <Label>Amount</Label>
+                        <Input
+                          type="text"
+                          value={item.amount.toFixed(2)}
+                          readOnly
+                          className="bg-gray-50 text-gray-600"
+                        />
+                      </div>
+                      <div className="md:col-span-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeItem(index)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>

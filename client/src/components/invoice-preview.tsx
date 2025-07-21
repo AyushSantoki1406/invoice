@@ -114,7 +114,12 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
                 {data.items && data.items.length > 0 ? (
                   data.items.map((item, index) => (
                     <tr key={index} className="border-b border-gray-200">
-                      <td className="py-3 text-gray-700">{item.description || "Service description"}</td>
+                      <td className="py-3 text-gray-700">
+                        <div className="font-medium text-gray-900">{item.title || "Service title"}</div>
+                        {item.description && (
+                          <div className="text-sm text-gray-600 mt-1">{item.description}</div>
+                        )}
+                      </td>
                       <td className="py-3 text-center text-gray-700">{item.quantity || 1}</td>
                       <td className="py-3 text-right text-gray-700">${formatCurrency(item.rate)}</td>
                       <td className="py-3 text-right text-gray-700">${formatCurrency(item.amount)}</td>

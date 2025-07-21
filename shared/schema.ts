@@ -31,7 +31,8 @@ export const invoices = pgTable("invoices", {
 });
 
 export const invoiceItemSchema = z.object({
-  description: z.string().min(1, "Description is required"),
+  title: z.string().min(1, "Title is required"),
+  description: z.string().default(""),
   quantity: z.number().min(1, "Quantity must be at least 1"),
   rate: z.number().min(0, "Rate must be positive"),
   amount: z.number().min(0, "Amount must be positive"),

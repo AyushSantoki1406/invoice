@@ -130,8 +130,29 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
       pdf.setDrawColor(200, 200, 200);
       pdf.line(margin, currentY, pageWidth - margin, currentY);
       
-      const rowHeight = 8;
-      pdf.text(item.description || '', colX[0] + 2, currentY + 5);
+      let rowHeight = 8;
+      const titleText = item.title || '';
+      const descriptionText = item.description || '';
+      
+      // Calculate height needed for title and description
+      if (descriptionText) {
+        rowHeight = 12; // Increased for two lines
+      }
+      
+      // Title (bold)
+      pdf.setFont(undefined, 'bold');
+      pdf.text(titleText, colX[0] + 2, currentY + 5);
+      
+      // Description (normal font, smaller)
+      if (descriptionText) {
+        pdf.setFont(undefined, 'normal');
+        pdf.setFontSize(8);
+        pdf.text(descriptionText, colX[0] + 2, currentY + 9);
+        pdf.setFontSize(10); // Reset font size
+      }
+      
+      // Reset font to normal for other columns
+      pdf.setFont(undefined, 'normal');
       pdf.text(item.quantity.toString(), colX[1] + 2, currentY + 5);
       pdf.text(`$${formatCurrency(item.rate)}`, colX[2] + 2, currentY + 5);
       pdf.text(`$${formatCurrency(item.amount)}`, colX[3] + 2, currentY + 5);
