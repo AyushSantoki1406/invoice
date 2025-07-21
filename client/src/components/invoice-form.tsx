@@ -57,7 +57,6 @@ export default function InvoiceForm({
       title: "",
       description: "",
       quantity: 1,
-      rate: 0,
       amount: 0,
     };
     const currentItems = form.getValues("items") || [];
@@ -73,13 +72,6 @@ export default function InvoiceForm({
     const currentItems = form.getValues("items") || [];
     const updatedItems = [...currentItems];
     updatedItems[index] = { ...updatedItems[index], [field]: value };
-    
-    // Calculate amount for quantity and rate changes
-    if (field === "quantity" || field === "rate") {
-      const quantity = field === "quantity" ? Number(value) : updatedItems[index].quantity;
-      const rate = field === "rate" ? Number(value) : updatedItems[index].rate;
-      updatedItems[index].amount = quantity * rate;
-    }
     
     form.setValue("items", updatedItems);
   };
@@ -345,10 +337,7 @@ export default function InvoiceForm({
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-                      <div className="md:col-span-5">
-                        {/* Spacer for layout */}
-                      </div>
+                    <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                       <div className="md:col-span-2">
                         <Label>Quantity</Label>
                         <Input
@@ -359,22 +348,13 @@ export default function InvoiceForm({
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <Label>Rate</Label>
+                        <Label>Amount (₹)</Label>
                         <Input
                           type="number"
                           step="0.01"
                           min="0"
-                          value={item.rate}
-                          onChange={(e) => updateItem(index, "rate", Number(e.target.value))}
-                        />
-                      </div>
-                      <div className="md:col-span-2">
-                        <Label>Amount</Label>
-                        <Input
-                          type="text"
-                          value={item.amount.toFixed(2)}
-                          readOnly
-                          className="bg-gray-50 text-gray-600"
+                          value={item.amount}
+                          onChange={(e) => updateItem(index, "amount", Number(e.target.value))}
                         />
                       </div>
                       <div className="md:col-span-1">
@@ -415,7 +395,7 @@ export default function InvoiceForm({
             <div className="bg-gray-50 rounded-lg p-4 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-gray-700">Subtotal:</span>
-                <span className="font-semibold">${form.watch("subtotal") || "0.00"}</span>
+                <span className="font-semibold">₹{form.watch("subtotal") || "0.00"}</span>
               </div>
               
               <div className="flex justify-between items-center">
@@ -433,13 +413,13 @@ export default function InvoiceForm({
                   />
                   <span className="text-gray-700">%</span>
                 </div>
-                <span className="font-semibold">${form.watch("taxAmount") || "0.00"}</span>
+                <span className="font-semibold">₹{form.watch("taxAmount") || "0.00"}</span>
               </div>
               
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-2">
                   <span className="text-gray-700">Discount:</span>
-                  <span className="text-gray-700">$</span>
+                  <span className="text-gray-700">₹</span>
                   <Input
                     type="number"
                     min="0"
@@ -456,7 +436,7 @@ export default function InvoiceForm({
               
               <div className="flex justify-between items-center text-lg font-bold">
                 <span className="text-gray-900">Total:</span>
-                <span className="text-primary">${form.watch("total") || "0.00"}</span>
+                <span className="text-primary">₹{form.watch("total") || "0.00"}</span>
               </div>
             </div>
           </div>
@@ -511,6 +491,37 @@ export default function InvoiceForm({
                   </FormItem>
                 )}
               />
+              
+              <div className="md:col-span-2">
+                <Label>Payment QR Code</Label>
+                <div className="mt-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        try {
+                          const formData = new FormData();
+                          formData.append('qrcode', file);
+                          const response = await fetch('/api/upload/qrcode', {
+                            method: 'POST',
+                            body: formData,
+                          });
+                          const result = await response.json();
+                          if (result.filePath) {
+                            form.setValue("paymentQRCode", result.filePath);
+                          }
+                        } catch (error) {
+                          console.error('QR code upload failed:', error);
+                        }
+                      }
+                    }}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Upload your own QR code for payments</p>
+                </div>
+              </div>
               <FormField
                 control={form.control}
                 name="paymentTerms"

@@ -25,6 +25,7 @@ export const invoices = pgTable("invoices", {
   bankAccount: text("bank_account").default(""),
   ifscCode: text("ifsc_code").default(""),
   upiId: text("upi_id").default(""),
+  paymentQRCode: text("payment_qr_code").default(""), // Upload your own QR code
   paymentTerms: text("payment_terms").default("Net 30"),
   notes: text("notes").default(""),
   createdAt: timestamp("created_at").defaultNow(),
@@ -34,7 +35,6 @@ export const invoiceItemSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().default(""),
   quantity: z.number().min(1, "Quantity must be at least 1"),
-  rate: z.number().min(0, "Rate must be positive"),
   amount: z.number().min(0, "Amount must be positive"),
 });
 

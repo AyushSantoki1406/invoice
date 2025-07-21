@@ -102,8 +102,8 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
 
   // Items table
   const tableStartY = currentY;
-  const colWidths = [80, 20, 30, 30];
-  const colX = [margin, margin + colWidths[0], margin + colWidths[0] + colWidths[1], margin + colWidths[0] + colWidths[1] + colWidths[2]];
+  const colWidths = [110, 20, 30];
+  const colX = [margin, margin + colWidths[0], margin + colWidths[0] + colWidths[1]];
 
   // Table header
   pdf.setFillColor(240, 240, 240);
@@ -113,8 +113,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   pdf.setTextColor(0, 0, 0);
   pdf.text('Description', colX[0] + 2, currentY + 5);
   pdf.text('Qty', colX[1] + 2, currentY + 5);
-  pdf.text('Rate', colX[2] + 2, currentY + 5);
-  pdf.text('Amount', colX[3] + 2, currentY + 5);
+  pdf.text('Amount', colX[2] + 2, currentY + 5);
   
   currentY += 8;
 
@@ -141,21 +140,20 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
       
       // Title (bold)
       pdf.setFont(undefined, 'bold');
-      pdf.text(titleText, colX[0] + 2, currentY + 5);
+      pdf.text(titleText || '', colX[0] + 2, currentY + 5);
       
       // Description (normal font, smaller)
       if (descriptionText) {
         pdf.setFont(undefined, 'normal');
         pdf.setFontSize(8);
-        pdf.text(descriptionText, colX[0] + 2, currentY + 9);
+        pdf.text(descriptionText || '', colX[0] + 2, currentY + 9);
         pdf.setFontSize(10); // Reset font size
       }
       
       // Reset font to normal for other columns
       pdf.setFont(undefined, 'normal');
       pdf.text(item.quantity.toString(), colX[1] + 2, currentY + 5);
-      pdf.text(`$${formatCurrency(item.rate)}`, colX[2] + 2, currentY + 5);
-      pdf.text(`$${formatCurrency(item.amount)}`, colX[3] + 2, currentY + 5);
+      pdf.text(`₹${formatCurrency(item.amount)}`, colX[2] + 2, currentY + 5);
       
       currentY += rowHeight;
     });
@@ -171,19 +169,19 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   pdf.setFontSize(10);
   if (data.subtotal) {
     pdf.text('Subtotal:', totalsX - 30, currentY);
-    pdf.text(`$${formatCurrency(data.subtotal)}`, totalsX, currentY);
+    pdf.text(`₹${formatCurrency(data.subtotal)}`, totalsX, currentY);
     currentY += 6;
   }
   
   if (data.taxRate && parseFloat(data.taxRate) > 0) {
     pdf.text(`Tax (${data.taxRate}%):`, totalsX - 30, currentY);
-    pdf.text(`$${formatCurrency(data.taxAmount || 0)}`, totalsX, currentY);
+    pdf.text(`₹${formatCurrency(data.taxAmount || 0)}`, totalsX, currentY);
     currentY += 6;
   }
   
   if (data.discountAmount && parseFloat(data.discountAmount) > 0) {
     pdf.text('Discount:', totalsX - 30, currentY);
-    pdf.text(`-$${formatCurrency(data.discountAmount)}`, totalsX, currentY);
+    pdf.text(`-₹${formatCurrency(data.discountAmount)}`, totalsX, currentY);
     currentY += 6;
   }
   
@@ -191,7 +189,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   pdf.setFontSize(12);
   pdf.setTextColor(37, 99, 235);
   pdf.text('Total:', totalsX - 30, currentY);
-  pdf.text(`$${formatCurrency(data.total || 0)}`, totalsX, currentY);
+  pdf.text(`₹${formatCurrency(data.total || 0)}`, totalsX, currentY);
   currentY += 15;
 
   // Payment information

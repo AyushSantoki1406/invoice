@@ -1,23 +1,13 @@
-import { Building, QrCode } from "lucide-react";
+import { Building } from "lucide-react";
 import { type InsertInvoice } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { generateQRCode } from "@/lib/qr-generator";
-import { useEffect, useState } from "react";
 
 interface InvoicePreviewProps {
   data: InsertInvoice;
 }
 
 export default function InvoicePreview({ data }: InvoicePreviewProps) {
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
-
-  useEffect(() => {
-    // Generate QR code for UPI payment
-    if (data.upiId && data.total) {
-      const upiString = `upi://pay?pa=${data.upiId}&pn=${data.companyName}&am=${data.total}&cu=INR`;
-      generateQRCode(upiString).then(setQrCodeUrl);
-    }
-  }, [data.upiId, data.companyName, data.total]);
+  // No longer auto-generating QR codes - user uploads their own
 
   const formatCurrency = (amount: string | number) => {
     const num = typeof amount === 'string' ? parseFloat(amount) : amount;
@@ -106,7 +96,6 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
                 <tr className="border-b-2 border-gray-300">
                   <th className="text-left py-3 font-semibold text-gray-900">Description</th>
                   <th className="text-center py-3 font-semibold text-gray-900 w-20">Qty</th>
-                  <th className="text-right py-3 font-semibold text-gray-900 w-24">Rate</th>
                   <th className="text-right py-3 font-semibold text-gray-900 w-24">Amount</th>
                 </tr>
               </thead>
@@ -121,13 +110,12 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
                         )}
                       </td>
                       <td className="py-3 text-center text-gray-700">{item.quantity || 1}</td>
-                      <td className="py-3 text-right text-gray-700">${formatCurrency(item.rate)}</td>
-                      <td className="py-3 text-right text-gray-700">${formatCurrency(item.amount)}</td>
+                      <td className="py-3 text-right text-gray-700">₹{formatCurrency(item.amount)}</td>
                     </tr>
                   ))
                 ) : (
                   <tr className="border-b border-gray-200">
-                    <td className="py-3 text-gray-500 italic" colSpan={4}>No items added yet</td>
+                    <td className="py-3 text-gray-500 italic" colSpan={3}>No items added yet</td>
                   </tr>
                 )}
               </tbody>
@@ -139,23 +127,23 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
             <div className="w-64">
               <div className="flex justify-between py-2">
                 <span className="text-gray-700">Subtotal:</span>
-                <span>${formatCurrency(data.subtotal || 0)}</span>
+                <span>₹{formatCurrency(data.subtotal || 0)}</span>
               </div>
               {data.taxRate && parseFloat(data.taxRate) > 0 && (
                 <div className="flex justify-between py-2">
                   <span className="text-gray-700">Tax ({data.taxRate}%):</span>
-                  <span>${formatCurrency(data.taxAmount || 0)}</span>
+                  <span>₹{formatCurrency(data.taxAmount || 0)}</span>
                 </div>
               )}
               {data.discountAmount && parseFloat(data.discountAmount) > 0 && (
                 <div className="flex justify-between py-2">
                   <span className="text-gray-700">Discount:</span>
-                  <span>-${formatCurrency(data.discountAmount)}</span>
+                  <span>-₹{formatCurrency(data.discountAmount)}</span>
                 </div>
               )}
               <div className="flex justify-between py-2 border-t border-gray-300 font-bold text-lg">
                 <span className="text-gray-900">Total:</span>
-                <span className="text-primary">${formatCurrency(data.total || 0)}</span>
+                <span className="text-primary">₹{formatCurrency(data.total || 0)}</span>
               </div>
             </div>
           </div>
@@ -168,19 +156,17 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
                 {data.bankAccount && <p>Bank: {data.bankAccount}</p>}
                 {data.ifscCode && <p>IFSC: {data.ifscCode}</p>}
                 {data.upiId && <p>UPI: {data.upiId}</p>}
-                <p>Terms: {data.paymentTerms || "Net 30"}</p>
+                {data.paymentTerms && <p>Terms: {data.paymentTerms}</p>}
               </div>
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">QR Code Payment:</h3>
-              <div className="w-24 h-24 bg-gray-200 flex items-center justify-center rounded">
-                {qrCodeUrl ? (
-                  <img src={qrCodeUrl} alt="Payment QR Code" className="w-full h-full" />
-                ) : (
-                  <QrCode className="text-gray-400 text-2xl" />
-                )}
+            {data.paymentQRCode && (
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">QR Code Payment:</h3>
+                <div className="w-24 h-24 bg-gray-200 flex items-center justify-center rounded">
+                  <img src={data.paymentQRCode} alt="Payment QR Code" className="w-full h-full object-contain" />
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Notes */}

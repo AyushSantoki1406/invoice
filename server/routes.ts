@@ -171,6 +171,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/upload/qrcode", upload.single('qrcode'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      // Return the file path that can be used in the frontend
+      const filePath = `/uploads/${req.file.filename}`;
+      res.json({ filePath, originalName: req.file.originalname });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to upload QR code" });
+    }
+  });
+
   // Serve uploaded files
   app.use('/uploads', (req, res, next) => {
     const filePath = path.join(process.cwd(), 'uploads', req.path);
