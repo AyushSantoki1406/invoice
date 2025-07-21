@@ -8,6 +8,21 @@ This is a full-stack invoice generator application built with React, TypeScript,
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (January 2025)
+
+### Amount Input & Quantity Multiplication Fix
+- Fixed amount typing issues with decimal numbers (e.g., 99.50)
+- Implemented proper quantity multiplication: when quantity is 2, total amount doubles
+- Updated calculation logic to handle direct amount entry with quantity multipliers
+- Fixed preview and PDF to show quantity × amount = total line amount
+
+### PDF Generation Improvements
+- Enhanced professional appearance with better styling
+- Fixed currency formatting using Indian number formatting (₹1,50,000.00)
+- Improved table headers with blue background and white text
+- Better typography with bold fonts for headers and company name
+- Removed formatting issues that caused extra characters in amounts
+
 ## System Architecture
 
 ### Frontend Architecture

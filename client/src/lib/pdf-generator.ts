@@ -21,16 +21,18 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
     }
   };
 
-  // Header
-  pdf.setFontSize(24);
+  // Header with better styling
+  pdf.setFontSize(28);
+  pdf.setFont(undefined, 'bold');
   pdf.setTextColor(37, 99, 235); // Primary blue
-  pdf.text('INVOICE', pageWidth - margin - 40, currentY);
+  pdf.text('INVOICE', pageWidth - margin - 45, currentY + 5);
   
-  // Company name
-  pdf.setFontSize(18);
+  // Company name with better styling
+  pdf.setFontSize(20);
+  pdf.setFont(undefined, 'bold');
   pdf.setTextColor(0, 0, 0);
-  pdf.text(data.companyName || 'Your Company', margin, currentY);
-  currentY += 10;
+  pdf.text(data.companyName || 'Your Company', margin, currentY + 5);
+  currentY += 15;
 
   // Company details
   pdf.setFontSize(10);
@@ -105,22 +107,24 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   const colWidths = [110, 20, 30];
   const colX = [margin, margin + colWidths[0], margin + colWidths[0] + colWidths[1]];
 
-  // Table header
-  pdf.setFillColor(240, 240, 240);
-  pdf.rect(margin, currentY, pageWidth - 2 * margin, 8, 'F');
+  // Table header with better styling
+  pdf.setFillColor(37, 99, 235);
+  pdf.rect(margin, currentY, pageWidth - 2 * margin, 10, 'F');
   
-  pdf.setFontSize(10);
-  pdf.setTextColor(0, 0, 0);
-  pdf.text('Description', colX[0] + 2, currentY + 5);
-  pdf.text('Qty', colX[1] + 2, currentY + 5);
-  pdf.text('Amount', colX[2] + 2, currentY + 5);
+  pdf.setFontSize(11);
+  pdf.setFont(undefined, 'bold');
+  pdf.setTextColor(255, 255, 255);
+  pdf.text('Description', colX[0] + 2, currentY + 6);
+  pdf.text('Qty', colX[1] + 2, currentY + 6);
+  pdf.text('Total Amount', colX[2] + 2, currentY + 6);
   
-  currentY += 8;
+  currentY += 10;
 
   // Table rows
   const formatCurrency = (amount: string | number) => {
     const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-    return isNaN(num) ? "0.00" : num.toFixed(2);
+    if (isNaN(num)) return "0.00";
+    return num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
   if (data.items && data.items.length > 0) {
@@ -140,20 +144,22 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
       
       // Title (bold)
       pdf.setFont(undefined, 'bold');
-      pdf.text(titleText || '', colX[0] + 2, currentY + 5);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(titleText, colX[0] + 2, currentY + 5);
       
       // Description (normal font, smaller)
       if (descriptionText) {
         pdf.setFont(undefined, 'normal');
         pdf.setFontSize(8);
-        pdf.text(descriptionText || '', colX[0] + 2, currentY + 9);
+        pdf.text(descriptionText, colX[0] + 2, currentY + 9);
         pdf.setFontSize(10); // Reset font size
       }
       
       // Reset font to normal for other columns
       pdf.setFont(undefined, 'normal');
       pdf.text(item.quantity.toString(), colX[1] + 2, currentY + 5);
-      pdf.text(`₹${formatCurrency(item.amount)}`, colX[2] + 2, currentY + 5);
+      const lineTotal = (item.amount || 0) * (item.quantity || 1);
+      pdf.text(`₹${formatCurrency(lineTotal)}`, colX[2] + 2, currentY + 5);
       
       currentY += rowHeight;
     });

@@ -110,7 +110,7 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
                         )}
                       </td>
                       <td className="py-3 text-center text-gray-700">{item.quantity || 1}</td>
-                      <td className="py-3 text-right text-gray-700">₹{formatCurrency(item.amount)}</td>
+                      <td className="py-3 text-right text-gray-700">₹{formatCurrency((item.amount || 0) * (item.quantity || 1))}</td>
                     </tr>
                   ))
                 ) : (

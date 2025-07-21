@@ -53,7 +53,8 @@ export function useInvoice(invoiceId?: number) {
     const items = invoiceData.items || [];
     const subtotal = items.reduce((sum, item) => {
       const amount = typeof item.amount === 'string' ? parseFloat(item.amount) || 0 : item.amount || 0;
-      return sum + amount;
+      const quantity = item.quantity || 1;
+      return sum + (amount * quantity);
     }, 0);
     const taxRate = parseFloat(invoiceData.taxRate || "0");
     const taxAmount = (subtotal * taxRate) / 100;
