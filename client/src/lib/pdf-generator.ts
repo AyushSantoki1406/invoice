@@ -21,30 +21,31 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
     }
   };
 
+  // Company logo space (we'll add logo loading later)
+  let logoSpace = 0;
+  if (data.companyLogo) {
+    logoSpace = 35; // Reserve space for logo
+    currentY += logoSpace;
+  }
+
   // Header with better styling
   pdf.setFontSize(28);
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(37, 99, 235); // Primary blue
-  pdf.text(('INVOICE'), pageWidth - margin - 45, currentY + 5);
+  pdf.text('INVOICE', pageWidth - margin - 45, currentY + 5);
   
-  // Company name with better styling
+  // Company name with better styling (only show if no detailed info in From section)
   pdf.setFontSize(20);
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(0, 0, 0);
-  pdf.text((data.companyName || 'Your Company'), margin, currentY + 5);
+  pdf.text(data.companyName || 'Your Company', margin, currentY + 5);
   currentY += 15;
 
-  // Company details
+  // Basic company contact (keep minimal to avoid duplication)
   pdf.setFontSize(10);
   pdf.setTextColor(100, 100, 100);
   if (data.companyEmail) {
     currentY = addText(data.companyEmail, margin, currentY);
-  }
-  if (data.companyAddress) {
-    currentY = addText(data.companyAddress, margin, currentY, pageWidth - 100);
-  }
-  if (data.companyPhone) {
-    currentY = addText(data.companyPhone, margin, currentY);
   }
   if (data.companyWebsite) {
     currentY = addText(data.companyWebsite, margin, currentY);
@@ -67,14 +68,19 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   // From and Bill To section
   const sectionY = currentY;
   
-  // From section
+  // From section (complete company details)
   pdf.setFontSize(12);
+  pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(0, 0, 0);
   addText('From:', margin, currentY, undefined, 12);
   currentY += 8;
   
-  pdf.setFontSize(10);
+  pdf.setFontSize(11);
+  pdf.setFont('helvetica', 'bold');
   currentY = addText(data.companyName || 'Your Company', margin, currentY);
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(10);
   if (data.companyAddress) {
     currentY = addText(data.companyAddress, margin, currentY, (pageWidth / 2) - margin);
   }
@@ -88,11 +94,16 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   // Bill To section
   let billToY = sectionY;
   pdf.setFontSize(12);
+  pdf.setFont('helvetica', 'bold');
   addText('Bill To:', pageWidth / 2, billToY, undefined, 12);
   billToY += 8;
   
-  pdf.setFontSize(10);
+  pdf.setFontSize(11);
+  pdf.setFont('helvetica', 'bold');
   billToY = addText(data.clientName || 'Client Name', pageWidth / 2, billToY);
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(10);
   if (data.clientAddress) {
     billToY = addText(data.clientAddress, pageWidth / 2, billToY, (pageWidth / 2) - margin);
   }
@@ -118,7 +129,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   pdf.rect(margin, currentY, tableWidth, 12);
   
   pdf.setFontSize(12);
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(0, 0, 0);
   pdf.text('Description', colX[0] + 5, currentY + 8);
   pdf.text('Qty', colX[1] + 5, currentY + 8);
@@ -156,14 +167,14 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
       pdf.rect(margin, currentY, tableWidth, rowHeight);
       
       // Title (bold, larger)
-      pdf.setFont(undefined, 'bold');
+      pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(11);
       pdf.setTextColor(0, 0, 0);
       pdf.text(titleText || '', colX[0] + 5, currentY + 10);
       
       // Description (normal font, smaller, gray)
       if (descriptionText) {
-        pdf.setFont(undefined, 'normal');
+        pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(9);
         pdf.setTextColor(80, 80, 80);
         const descLines = pdf.splitTextToSize(descriptionText, colWidths[0] - 10);
@@ -171,7 +182,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
       }
       
       // Quantity (centered)
-      pdf.setFont(undefined, 'normal');
+      pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(11);
       pdf.setTextColor(0, 0, 0);
       const qtyText = (item.quantity || 1).toString();
@@ -234,7 +245,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   currentY += 5;
   
   pdf.setFontSize(14);
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(37, 99, 235);
   pdf.text('Total:', totalsX, currentY);
   const totalAmount = `Rs. ${formatCurrency(data.total || 0)}`;
