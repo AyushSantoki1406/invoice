@@ -353,8 +353,8 @@ export default function InvoiceForm({
                           type="number"
                           step="0.01"
                           min="0"
-                          value={item.amount}
-                          onChange={(e) => updateItem(index, "amount", Number(e.target.value))}
+                          value={item.amount || ""}
+                          onChange={(e) => updateItem(index, "amount", e.target.value === "" ? "" : parseFloat(e.target.value) || 0)}
                         />
                       </div>
                       <div className="md:col-span-1">

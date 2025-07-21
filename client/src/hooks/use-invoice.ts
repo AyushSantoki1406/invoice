@@ -51,7 +51,10 @@ export function useInvoice(invoiceId?: number) {
   // Calculate totals whenever items, tax, or discount change
   useEffect(() => {
     const items = invoiceData.items || [];
-    const subtotal = items.reduce((sum, item) => sum + (item.amount || 0), 0);
+    const subtotal = items.reduce((sum, item) => {
+      const amount = typeof item.amount === 'string' ? parseFloat(item.amount) || 0 : item.amount || 0;
+      return sum + amount;
+    }, 0);
     const taxRate = parseFloat(invoiceData.taxRate || "0");
     const taxAmount = (subtotal * taxRate) / 100;
     const discountAmount = parseFloat(invoiceData.discountAmount || "0");
@@ -93,13 +96,7 @@ export function useInvoice(invoiceId?: number) {
     setInvoiceData(prev => {
       const updated = { ...prev, ...updates };
       
-      // Recalculate item amounts if items are updated
-      if (updates.items) {
-        updated.items = updates.items.map(item => ({
-          ...item,
-          amount: (item.quantity || 0) * (item.rate || 0),
-        }));
-      }
+      // No need to recalculate amounts since users enter them directly
       
       return updated;
     });
