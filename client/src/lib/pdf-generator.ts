@@ -180,7 +180,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
       
       // Amount (right-aligned)
       const lineTotal = (item.amount || 0) * (item.quantity || 1);
-      const amountText = `₹${formatCurrency(lineTotal)}`;
+      const amountText = `Rs. ${formatCurrency(lineTotal)}`;
       const amountWidth = pdf.getTextWidth(amountText);
       pdf.text(amountText, colX[2] + colWidths[2] - amountWidth - 5, currentY + 10);
       
@@ -203,7 +203,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
     pdf.setFontSize(11);
     pdf.setTextColor(0, 0, 0);
     pdf.text('Subtotal:', totalsX, currentY);
-    const subtotalAmount = `₹${formatCurrency(data.subtotal)}`;
+    const subtotalAmount = `Rs. ${formatCurrency(data.subtotal)}`;
     const subtotalWidth = pdf.getTextWidth(subtotalAmount);
     pdf.text(subtotalAmount, pageWidth - margin - subtotalWidth, currentY);
     currentY += 8;
@@ -212,7 +212,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   // Tax
   if (data.taxRate && parseFloat(data.taxRate) > 0) {
     pdf.text(`Tax (${data.taxRate}%):`, totalsX, currentY);
-    const taxAmount = `₹${formatCurrency(data.taxAmount || 0)}`;
+    const taxAmount = `Rs. ${formatCurrency(data.taxAmount || 0)}`;
     const taxWidth = pdf.getTextWidth(taxAmount);
     pdf.text(taxAmount, pageWidth - margin - taxWidth, currentY);
     currentY += 8;
@@ -221,7 +221,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   // Discount
   if (data.discountAmount && parseFloat(data.discountAmount) > 0) {
     pdf.text('Discount:', totalsX, currentY);
-    const discountAmount = `-₹${formatCurrency(data.discountAmount)}`;
+    const discountAmount = `-Rs. ${formatCurrency(data.discountAmount)}`;
     const discountWidth = pdf.getTextWidth(discountAmount);
     pdf.text(discountAmount, pageWidth - margin - discountWidth, currentY);
     currentY += 8;
@@ -237,7 +237,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   pdf.setFont(undefined, 'bold');
   pdf.setTextColor(37, 99, 235);
   pdf.text('Total:', totalsX, currentY);
-  const totalAmount = `₹${formatCurrency(data.total || 0)}`;
+  const totalAmount = `Rs. ${formatCurrency(data.total || 0)}`;
   const totalWidth = pdf.getTextWidth(totalAmount);
   pdf.text(totalAmount, pageWidth - margin - totalWidth, currentY);
   currentY += 20;
