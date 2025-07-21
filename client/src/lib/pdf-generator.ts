@@ -1,12 +1,60 @@
 import jsPDF from 'jspdf';
 import { type InsertInvoice } from '@shared/schema';
 
+// Helper function to load image as base64
+const loadImageAsBase64 = (url: string): Promise<string | null> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve(null);
+        return;
+      }
+      
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      
+      try {
+        const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+        resolve(dataURL);
+      } catch (error) {
+        console.warn('Canvas conversion error:', error);
+        resolve(null);
+      }
+    };
+    img.onerror = () => {
+      console.warn('Image load error for:', url);
+      resolve(null);
+    };
+    img.src = url;
+  });
+};
+
 export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => {
   const pdf = new jsPDF('p', 'mm', 'a4');
   const pageWidth = pdf.internal.pageSize.width;
   const pageHeight = pdf.internal.pageSize.height;
   const margin = 20;
   let currentY = margin;
+
+  // Load company logo if available
+  if (data.companyLogo) {
+    try {
+      const logoData = await loadImageAsBase64(data.companyLogo);
+      if (logoData) {
+        const logoWidth = 30;
+        const logoHeight = 20;
+        pdf.addImage(logoData, 'JPEG', margin, currentY, logoWidth, logoHeight);
+        currentY += logoHeight + 5;
+      }
+    } catch (error) {
+      console.warn('Could not load logo:', error);
+    }
+  }
 
   // Helper function to add text with word wrapping
   const addText = (text: string, x: number, y: number, maxWidth?: number, fontSize = 10) => {
@@ -21,12 +69,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
     }
   };
 
-  // Company logo space (we'll add logo loading later)
-  let logoSpace = 0;
-  if (data.companyLogo) {
-    logoSpace = 35; // Reserve space for logo
-    currentY += logoSpace;
-  }
+
 
   // Header with better styling
   pdf.setFontSize(28);
