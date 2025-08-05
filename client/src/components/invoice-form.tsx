@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import FileUpload from "@/components/ui/file-upload";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 interface InvoiceFormProps {
   data: InsertInvoice;
@@ -36,6 +36,17 @@ export default function InvoiceForm({
     resolver: zodResolver(insertInvoiceSchema),
     defaultValues: data,
   });
+  
+  // Watch document type for dynamic labels
+  const documentType = form.watch("documentType");
+  
+  // Memoize dynamic labels to prevent re-renders
+  const labels = useMemo(() => ({
+    headerTitle: documentType === "estimate" ? "Estimate Details" : "Invoice Details",
+    numberLabel: documentType === "estimate" ? "Estimate Number *" : "Invoice Number *",
+    numberPlaceholder: documentType === "estimate" ? "EST-001" : "INV-001",
+    itemsTitle: documentType === "estimate" ? "Estimate Items" : "Invoice Items"
+  }), [documentType]);
 
   // Update form when data changes
   useEffect(() => {
@@ -207,22 +218,43 @@ export default function InvoiceForm({
             </div>
           </div>
 
-          {/* Invoice Details */}
+          {/* Document Details */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2 mb-4">
               <FileText className="h-5 w-5 text-primary" />
-              <h3 className="text-lg font-semibold text-gray-900">Invoice Details</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{labels.headerTitle}</h3>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <FormField
+                control={form.control}
+                name="documentType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Document Type *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select document type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="invoice">Invoice</SelectItem>
+                        <SelectItem value="estimate">Estimate</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="invoiceNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Invoice Number *</FormLabel>
+                    <FormLabel>{labels.numberLabel}</FormLabel>
                     <FormControl>
-                      <Input placeholder="INV-001" {...field} />
+                      <Input placeholder={labels.numberPlaceholder} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -308,11 +340,11 @@ export default function InvoiceForm({
             />
           </div>
 
-          {/* Invoice Items */}
+          {/* Items */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2 mb-4">
               <List className="h-5 w-5 text-primary" />
-              <h3 className="text-lg font-semibold text-gray-900">Invoice Items</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{labels.itemsTitle}</h3>
             </div>
             
             <div className="space-y-4">
@@ -462,6 +494,22 @@ export default function InvoiceForm({
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="bankAccountHolder"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Account Holder Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Account Holder Name" {...field} value={field.value || ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="bankAccount"

@@ -91,7 +91,8 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   pdf.setFontSize(28);
   pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(37, 99, 235); // Primary blue
-  pdf.text('INVOICE', pageWidth - margin - 45, currentY + 5);
+  const documentTitle = data.documentType === 'estimate' ? 'ESTIMATE' : 'INVOICE';
+  pdf.text(documentTitle, pageWidth - margin - 45, currentY + 5);
   
   // Company name with better styling (only show if no detailed info in From section)
   pdf.setFontSize(20);
@@ -110,11 +111,13 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
     currentY = addText(data.companyWebsite, margin, currentY);
   }
 
-  // Invoice details (right side)
+  // Document details (right side)
   let rightY = margin + 10;
   pdf.setFontSize(10);
   pdf.setTextColor(0, 0, 0);
-  addText(`Invoice #: ${data.invoiceNumber || 'INV-001'}`, pageWidth - margin - 60, rightY);
+  const numberLabel = data.documentType === 'estimate' ? 'Estimate #:' : 'Invoice #:';
+  const defaultNumber = data.documentType === 'estimate' ? 'EST-001' : 'INV-001';
+  addText(`${numberLabel} ${data.invoiceNumber || defaultNumber}`, pageWidth - margin - 60, rightY);
   rightY += 6;
   addText(`Date: ${data.issueDate || new Date().toISOString().split('T')[0]}`, pageWidth - margin - 60, rightY);
   if (data.dueDate) {
@@ -313,7 +316,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   currentY += 20;
 
   // Payment information
-  if (data.bankName || data.bankAccount || data.ifscCode || data.upiId) {
+  if (data.bankName || data.bankAccountHolder || data.bankAccount || data.ifscCode || data.upiId) {
     pdf.setFontSize(12);
     pdf.setTextColor(0, 0, 0);
     addText('Payment Information:', margin, currentY, undefined, 12);
@@ -322,6 +325,9 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
     pdf.setFontSize(10);
     if (data.bankName) {
       currentY = addText(`Bank Name: ${data.bankName}`, margin, currentY);
+    }
+    if (data.bankAccountHolder) {
+      currentY = addText(`Account Holder: ${data.bankAccountHolder}`, margin, currentY);
     }
     if (data.bankAccount) {
       currentY = addText(`Bank Account: ${data.bankAccount}`, margin, currentY);
@@ -347,6 +353,7 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   }
 
   // Save the PDF
-  const fileName = `Invoice-${data.invoiceNumber || 'draft'}.pdf`;
+  const docType = data.documentType === 'estimate' ? 'Estimate' : 'Invoice';
+  const fileName = `${docType}-${data.invoiceNumber || 'draft'}.pdf`;
   pdf.save(fileName);
 };

@@ -5,12 +5,15 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import InvoiceCreator from "@/pages/invoice-creator";
+import EstimateCreator from "@/pages/estimate-creator";
+import Home from "./pages/home";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={InvoiceCreator} />
+      <Route path="/" component={Home} />
       <Route path="/invoice/:id?" component={InvoiceCreator} />
+      <Route path="/estimate/:id?" component={EstimateCreator} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -5,7 +5,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { type InsertInvoice, type InvoiceItem } from "@shared/schema";
 import { generateInvoicePDF } from "@/lib/pdf-generator";
 
-const createEmptyInvoice = (): InsertInvoice => ({
+const createEmptyInvoice = (documentType: "invoice" | "estimate" = "invoice"): InsertInvoice => ({
+  documentType,
   companyName: "",
   companyEmail: "",
   companyAddress: "",
@@ -15,7 +16,7 @@ const createEmptyInvoice = (): InsertInvoice => ({
   clientName: "",
   clientEmail: "",
   clientAddress: "",
-  invoiceNumber: `INV-${Date.now().toString().slice(-6)}`,
+  invoiceNumber: documentType === "estimate" ? `EST-${Date.now().toString().slice(-6)}` : `INV-${Date.now().toString().slice(-6)}`,
   issueDate: new Date().toISOString().split('T')[0],
   dueDate: "",
   items: [],
@@ -25,14 +26,16 @@ const createEmptyInvoice = (): InsertInvoice => ({
   discountAmount: "0",
   total: "0",
   bankName: "",
+  bankAccountHolder: "",
   bankAccount: "",
   ifscCode: "",
   upiId: "",
+  paymentQRCode: "",
   notes: "",
 });
 
-export function useInvoice(invoiceId?: number) {
-  const [invoiceData, setInvoiceData] = useState<InsertInvoice>(createEmptyInvoice());
+export function useInvoice(invoiceId?: number, documentType: "invoice" | "estimate" = "invoice") {
+  const [invoiceData, setInvoiceData] = useState<InsertInvoice>(createEmptyInvoice(documentType));
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

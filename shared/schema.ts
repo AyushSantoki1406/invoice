@@ -4,6 +4,7 @@ import { z } from "zod";
 
 export const invoices = pgTable("invoices", {
   id: serial("id").primaryKey(),
+  documentType: text("document_type").default("invoice"), // "invoice" or "estimate"
   invoiceNumber: text("invoice_number").notNull().unique(),
   companyName: text("company_name").notNull(),
   companyEmail: text("company_email").notNull(),
@@ -23,6 +24,7 @@ export const invoices = pgTable("invoices", {
   discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).default("0"),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
   bankName: text("bank_name").default(""),
+  bankAccountHolder: text("bank_account_holder").default(""),
   bankAccount: text("bank_account").default(""),
   ifscCode: text("ifsc_code").default(""),
   upiId: text("upi_id").default(""),
@@ -41,10 +43,11 @@ export const invoiceItemSchema = z.object({
 export type InvoiceItem = z.infer<typeof invoiceItemSchema>;
 
 export const insertInvoiceSchema = createInsertSchema(invoices, {
+  documentType: z.enum(["invoice", "estimate"]).default("invoice"),
   companyName: z.string().min(1, "Company name is required"),
   companyEmail: z.string().email("Valid email is required"),
   clientName: z.string().min(1, "Client name is required"),
-  invoiceNumber: z.string().min(1, "Invoice number is required"),
+  invoiceNumber: z.string().min(1, "Document number is required"),
   issueDate: z.string().min(1, "Issue date is required"),
   items: z.array(invoiceItemSchema).min(1, "At least one item is required"),
 }).omit({

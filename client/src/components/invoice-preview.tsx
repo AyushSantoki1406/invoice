@@ -48,9 +48,11 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
               </div>
             </div>
             <div className="text-right">
-              <h1 className="text-3xl font-bold text-primary mb-2">INVOICE</h1>
+              <h1 className="text-3xl font-bold text-primary mb-2">
+                {data.documentType === "estimate" ? "ESTIMATE" : "INVOICE"}
+              </h1>
               <p className="text-gray-600">
-                Invoice #: <span className="font-semibold">{data.invoiceNumber || "INV-001"}</span>
+                {data.documentType === "estimate" ? "Estimate #:" : "Invoice #:"} <span className="font-semibold">{data.invoiceNumber || (data.documentType === "estimate" ? "EST-001" : "INV-001")}</span>
               </p>
               <p className="text-gray-600">
                 Date: <span className="font-semibold">{data.issueDate || new Date().toISOString().split('T')[0]}</span>
@@ -154,6 +156,7 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
               <h3 className="font-semibold text-gray-900 mb-2">Payment Information:</h3>
               <div className="text-sm text-gray-700">
                 {data.bankName && <p>Bank Name: {data.bankName}</p>}
+                {data.bankAccountHolder && <p>Account Holder: {data.bankAccountHolder}</p>}
                 {data.bankAccount && <p>Account: {data.bankAccount}</p>}
                 {data.ifscCode && <p>IFSC: {data.ifscCode}</p>}
                 {data.upiId && <p>UPI: {data.upiId}</p>}
