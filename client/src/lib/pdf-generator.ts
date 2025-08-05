@@ -46,10 +46,26 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
     try {
       const logoData = await loadImageAsBase64(data.companyLogo);
       if (logoData) {
-        const logoWidth = 30;
-        const logoHeight = 20;
+        // Calculate logo dimensions maintaining aspect ratio
+        const img = new Image();
+        img.src = logoData;
+        const maxWidth = 40;
+        const maxHeight = 30;
+        
+        let logoWidth = maxWidth;
+        let logoHeight = maxHeight;
+        
+        if (img.width && img.height) {
+          const aspectRatio = img.width / img.height;
+          if (aspectRatio > maxWidth / maxHeight) {
+            logoHeight = logoWidth / aspectRatio;
+          } else {
+            logoWidth = logoHeight * aspectRatio;
+          }
+        }
+        
         pdf.addImage(logoData, 'JPEG', margin, currentY, logoWidth, logoHeight);
-        currentY += logoHeight + 5;
+        currentY += Math.max(logoHeight, 25) + 5;
       }
     } catch (error) {
       console.warn('Could not load logo:', error);
@@ -297,13 +313,16 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   currentY += 20;
 
   // Payment information
-  if (data.bankAccount || data.ifscCode || data.upiId) {
+  if (data.bankName || data.bankAccount || data.ifscCode || data.upiId) {
     pdf.setFontSize(12);
     pdf.setTextColor(0, 0, 0);
     addText('Payment Information:', margin, currentY, undefined, 12);
     currentY += 8;
     
     pdf.setFontSize(10);
+    if (data.bankName) {
+      currentY = addText(`Bank Name: ${data.bankName}`, margin, currentY);
+    }
     if (data.bankAccount) {
       currentY = addText(`Bank Account: ${data.bankAccount}`, margin, currentY);
     }
@@ -312,9 +331,6 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
     }
     if (data.upiId) {
       currentY = addText(`UPI ID: ${data.upiId}`, margin, currentY);
-    }
-    if (data.paymentTerms) {
-      currentY = addText(`Payment Terms: ${data.paymentTerms}`, margin, currentY);
     }
     currentY += 10;
   }

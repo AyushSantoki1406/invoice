@@ -24,10 +24,10 @@ const createEmptyInvoice = (): InsertInvoice => ({
   taxAmount: "0",
   discountAmount: "0",
   total: "0",
+  bankName: "",
   bankAccount: "",
   ifscCode: "",
   upiId: "",
-  paymentTerms: "Net 30",
   notes: "",
 });
 

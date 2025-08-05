@@ -22,11 +22,11 @@ export const invoices = pgTable("invoices", {
   taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).default("0"),
   discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).default("0"),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+  bankName: text("bank_name").default(""),
   bankAccount: text("bank_account").default(""),
   ifscCode: text("ifsc_code").default(""),
   upiId: text("upi_id").default(""),
   paymentQRCode: text("payment_qr_code").default(""), // Upload your own QR code
-  paymentTerms: text("payment_terms").default("Net 30"),
   notes: text("notes").default(""),
   createdAt: timestamp("created_at").defaultNow(),
 });

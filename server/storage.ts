@@ -57,7 +57,8 @@ export class MemStorage implements IStorage {
       bankAccount: insertInvoice.bankAccount ?? "",
       ifscCode: insertInvoice.ifscCode ?? "",
       upiId: insertInvoice.upiId ?? "",
-      paymentTerms: insertInvoice.paymentTerms ?? "Net 30",
+      paymentQRCode: insertInvoice.paymentQRCode ?? "",
+      bankName: insertInvoice.bankName ?? "",
       notes: insertInvoice.notes ?? "",
       createdAt: new Date(),
     };

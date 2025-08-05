@@ -153,10 +153,10 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
             <div>
               <h3 className="font-semibold text-gray-900 mb-2">Payment Information:</h3>
               <div className="text-sm text-gray-700">
-                {data.bankAccount && <p>Bank: {data.bankAccount}</p>}
+                {data.bankName && <p>Bank Name: {data.bankName}</p>}
+                {data.bankAccount && <p>Account: {data.bankAccount}</p>}
                 {data.ifscCode && <p>IFSC: {data.ifscCode}</p>}
                 {data.upiId && <p>UPI: {data.upiId}</p>}
-                {data.paymentTerms && <p>Terms: {data.paymentTerms}</p>}
               </div>
             </div>
             {data.paymentQRCode && (
