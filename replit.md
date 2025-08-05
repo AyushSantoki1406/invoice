@@ -23,6 +23,14 @@ Preferred communication style: Simple, everyday language.
 - Better typography with bold fonts for headers and company name
 - Removed formatting issues that caused extra characters in amounts
 
+### Document Type System & Bank Details Conditional Display
+- Added document type selector with "Invoice" and "Estimate" options
+- Implemented conditional display of bank details (only shown for invoices, not estimates)
+- Updated form, preview, and PDF generation to respect document type requirements
+- Added bank account holder name field to payment details section
+- Created separate home page with navigation to both invoice and estimate creators
+- Enhanced user experience with appropriate labels and functionality based on document type
+
 ## System Architecture
 
 ### Frontend Architecture

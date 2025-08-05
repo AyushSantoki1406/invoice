@@ -473,119 +473,121 @@ export default function InvoiceForm({
             </div>
           </div>
 
-          {/* Payment Details */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2 mb-4">
-              <CreditCard className="h-5 w-5 text-primary" />
-              <h3 className="text-lg font-semibold text-gray-900">Payment Details</h3>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="bankName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Bank Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Bank Name" {...field} value={field.value || ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="bankAccountHolder"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Account Holder Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Account Holder Name" {...field} value={field.value || ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="bankAccount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Bank Account</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Account Number" {...field} value={field.value || ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="ifscCode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>IFSC Code</FormLabel>
-                    <FormControl>
-                      <Input placeholder="IFSC Code" {...field} value={field.value || ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="upiId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>UPI ID</FormLabel>
-                    <FormControl>
-                      <Input placeholder="yourname@upi" {...field} value={field.value || ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
-            
-            <div className="md:col-span-2">
-              <Label>Payment QR Code</Label>
-              <div className="mt-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      try {
-                        const formData = new FormData();
-                        formData.append('qrcode', file);
-                        const response = await fetch('/api/upload/qrcode', {
-                          method: 'POST',
-                          body: formData,
-                        });
-                        const result = await response.json();
-                        if (result.filePath) {
-                          form.setValue("paymentQRCode", result.filePath);
-                        }
-                      } catch (error) {
-                        console.error('QR code upload failed:', error);
-                      }
-                    }
-                  }}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90"
+          {/* Payment Details - Only show for invoices */}
+          {form.watch("documentType") === "invoice" && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 mb-4">
+                <CreditCard className="h-5 w-5 text-primary" />
+                <h3 className="text-lg font-semibold text-gray-900">Payment Details</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="bankName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bank Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Bank Name" {...field} value={field.value || ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <p className="text-xs text-gray-500 mt-1">Upload your own QR code for payments</p>
+                <FormField
+                  control={form.control}
+                  name="bankAccountHolder"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Account Holder Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Account Holder Name" {...field} value={field.value || ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="bankAccount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bank Account</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Account Number" {...field} value={field.value || ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="ifscCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>IFSC Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="IFSC Code" {...field} value={field.value || ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="upiId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>UPI ID</FormLabel>
+                      <FormControl>
+                        <Input placeholder="yourname@upi" {...field} value={field.value || ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              
+              <div className="md:col-span-2">
+                <Label>Payment QR Code</Label>
+                <div className="mt-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        try {
+                          const formData = new FormData();
+                          formData.append('qrcode', file);
+                          const response = await fetch('/api/upload/qrcode', {
+                            method: 'POST',
+                            body: formData,
+                          });
+                          const result = await response.json();
+                          if (result.filePath) {
+                            form.setValue("paymentQRCode", result.filePath);
+                          }
+                        } catch (error) {
+                          console.error('QR code upload failed:', error);
+                        }
+                      }
+                    }}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Upload your own QR code for payments</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Notes */}
           <div className="space-y-4">

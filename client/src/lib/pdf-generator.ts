@@ -315,8 +315,8 @@ export const generateInvoicePDF = async (data: InsertInvoice): Promise<void> => 
   pdf.text(totalAmount, pageWidth - margin - totalWidth, currentY);
   currentY += 20;
 
-  // Payment information
-  if (data.bankName || data.bankAccountHolder || data.bankAccount || data.ifscCode || data.upiId) {
+  // Payment information - Only show for invoices
+  if (data.documentType === "invoice" && (data.bankName || data.bankAccountHolder || data.bankAccount || data.ifscCode || data.upiId)) {
     pdf.setFontSize(12);
     pdf.setTextColor(0, 0, 0);
     addText('Payment Information:', margin, currentY, undefined, 12);

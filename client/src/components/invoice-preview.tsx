@@ -150,27 +150,29 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
             </div>
           </div>
 
-          {/* Payment Details */}
-          <div className="grid grid-cols-2 gap-8 mb-8">
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">Payment Information:</h3>
-              <div className="text-sm text-gray-700">
-                {data.bankName && <p>Bank Name: {data.bankName}</p>}
-                {data.bankAccountHolder && <p>Account Holder: {data.bankAccountHolder}</p>}
-                {data.bankAccount && <p>Account: {data.bankAccount}</p>}
-                {data.ifscCode && <p>IFSC: {data.ifscCode}</p>}
-                {data.upiId && <p>UPI: {data.upiId}</p>}
-              </div>
-            </div>
-            {data.paymentQRCode && (
+          {/* Payment Details - Only show for invoices */}
+          {data.documentType === "invoice" && (
+            <div className="grid grid-cols-2 gap-8 mb-8">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">QR Code Payment:</h3>
-                <div className="w-24 h-24 bg-gray-200 flex items-center justify-center rounded">
-                  <img src={data.paymentQRCode} alt="Payment QR Code" className="w-full h-full object-contain" />
+                <h3 className="font-semibold text-gray-900 mb-2">Payment Information:</h3>
+                <div className="text-sm text-gray-700">
+                  {data.bankName && <p>Bank Name: {data.bankName}</p>}
+                  {data.bankAccountHolder && <p>Account Holder: {data.bankAccountHolder}</p>}
+                  {data.bankAccount && <p>Account: {data.bankAccount}</p>}
+                  {data.ifscCode && <p>IFSC: {data.ifscCode}</p>}
+                  {data.upiId && <p>UPI: {data.upiId}</p>}
                 </div>
               </div>
-            )}
-          </div>
+              {data.paymentQRCode && (
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">QR Code Payment:</h3>
+                  <div className="w-24 h-24 bg-gray-200 flex items-center justify-center rounded">
+                    <img src={data.paymentQRCode} alt="Payment QR Code" className="w-full h-full object-contain" />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Notes */}
           {data.notes && (
