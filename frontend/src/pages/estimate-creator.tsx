@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function EstimateCreator() {
   const params = useParams();
-  const invoiceId = params.id ? parseInt(params.id) : undefined;
+  const invoiceId = params.id;
   const { toast } = useToast();
   
   const {

@@ -34,7 +34,7 @@ const createEmptyInvoice = (documentType: "invoice" | "estimate" = "invoice"): I
   notes: "",
 });
 
-export function useInvoice(invoiceId?: number, documentType: "invoice" | "estimate" = "invoice") {
+export function useInvoice(invoiceId?: string, documentType: "invoice" | "estimate" = "invoice") {
   const [invoiceData, setInvoiceData] = useState<InsertInvoice>(createEmptyInvoice(documentType));
   const { toast } = useToast();
   const queryClient = useQueryClient();

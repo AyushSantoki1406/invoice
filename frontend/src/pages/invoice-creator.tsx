@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function InvoiceCreator() {
   const params = useParams();
-  const invoiceId = params.id ? parseInt(params.id) : undefined;
+  const invoiceId = params.id;
   const { toast } = useToast();
   
   const {

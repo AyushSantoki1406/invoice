@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Calculator, ChevronRight } from "lucide-react";
+import { FileText, Calculator, ChevronRight, List } from "lucide-react";
 
 export default function Home() {
   return (
@@ -14,6 +14,12 @@ export default function Home() {
               <FileText className="text-primary text-2xl mr-3" />
               <h1 className="text-xl font-bold text-gray-900">Invoice & Estimate Creator Pro</h1>
             </div>
+            <Link href="/invoices">
+              <Button variant="outline" data-testid="button-view-all">
+                <List className="h-4 w-4 mr-2" />
+                View All Documents
+              </Button>
+            </Link>
           </div>
         </div>
       </header>
