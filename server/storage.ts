@@ -1,4 +1,8 @@
 import type { Invoice, InsertInvoice, InvoiceTemplate, InsertTemplate } from "@shared/schema";
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { invoices, invoiceTemplates } from "@shared/schema";
+import { eq } from "drizzle-orm";
+import ws from "ws";
 
 export interface IStorage {
   getInvoices(): Promise<Invoice[]>;
@@ -13,69 +17,62 @@ export interface IStorage {
   deleteTemplate(id: number): Promise<boolean>;
 }
 
-export class MemStorage implements IStorage {
-  private invoices: Map<number, Invoice> = new Map();
-  private templates: Map<number, InvoiceTemplate> = new Map();
-  private invoiceIdCounter = 1;
-  private templateIdCounter = 1;
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL is not set");
+}
 
+const db = drizzle({
+  connection: process.env.DATABASE_URL,
+  ws: ws,
+});
+
+export class DatabaseStorage implements IStorage {
   async getInvoices(): Promise<Invoice[]> {
-    return Array.from(this.invoices.values());
+    return await db.select().from(invoices);
   }
 
   async getInvoiceById(id: number): Promise<Invoice | undefined> {
-    return this.invoices.get(id);
+    const result = await db.select().from(invoices).where(eq(invoices.id, id));
+    return result[0];
   }
 
   async createInvoice(invoice: InsertInvoice): Promise<Invoice> {
-    const id = this.invoiceIdCounter++;
-    const newInvoice: Invoice = {
-      ...invoice,
-      id,
-      createdAt: new Date(),
-    } as Invoice;
-    this.invoices.set(id, newInvoice);
-    return newInvoice;
+    const result = await db.insert(invoices).values(invoice).returning();
+    return result[0];
   }
 
   async updateInvoice(id: number, invoice: Partial<InsertInvoice>): Promise<Invoice | undefined> {
-    const existing = this.invoices.get(id);
-    if (!existing) return undefined;
-
-    const updated: Invoice = {
-      ...existing,
-      ...invoice,
-    };
-    this.invoices.set(id, updated);
-    return updated;
+    const result = await db
+      .update(invoices)
+      .set(invoice)
+      .where(eq(invoices.id, id))
+      .returning();
+    return result[0];
   }
 
   async deleteInvoice(id: number): Promise<boolean> {
-    return this.invoices.delete(id);
+    const result = await db.delete(invoices).where(eq(invoices.id, id)).returning();
+    return result.length > 0;
   }
 
   async getTemplates(): Promise<InvoiceTemplate[]> {
-    return Array.from(this.templates.values());
+    return await db.select().from(invoiceTemplates);
   }
 
   async getTemplateById(id: number): Promise<InvoiceTemplate | undefined> {
-    return this.templates.get(id);
+    const result = await db.select().from(invoiceTemplates).where(eq(invoiceTemplates.id, id));
+    return result[0];
   }
 
   async createTemplate(template: InsertTemplate): Promise<InvoiceTemplate> {
-    const id = this.templateIdCounter++;
-    const newTemplate: InvoiceTemplate = {
-      ...template,
-      id,
-      createdAt: new Date(),
-    };
-    this.templates.set(id, newTemplate);
-    return newTemplate;
+    const result = await db.insert(invoiceTemplates).values(template).returning();
+    return result[0];
   }
 
   async deleteTemplate(id: number): Promise<boolean> {
-    return this.templates.delete(id);
+    const result = await db.delete(invoiceTemplates).where(eq(invoiceTemplates.id, id)).returning();
+    return result.length > 0;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

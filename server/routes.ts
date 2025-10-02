@@ -2,6 +2,23 @@ import type { Express } from "express";
 import { storage } from "./storage";
 import { insertInvoiceSchema, insertTemplateSchema } from "@shared/schema";
 import { ZodError } from "zod";
+import multer from "multer";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const uploadStorage = multer.diskStorage({
+  destination: function (_req, _file, cb) {
+    cb(null, path.join(__dirname, "../uploads"));
+  },
+  filename: function (_req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: uploadStorage });
 
 export function registerRoutes(app: Express) {
   app.get("/api/invoices", async (_req, res) => {
@@ -112,6 +129,30 @@ export function registerRoutes(app: Express) {
         return res.status(404).json({ message: "Template not found" });
       }
       res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/upload/logo", upload.single("logo"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      const fileUrl = `/uploads/${req.file.filename}`;
+      res.json({ url: fileUrl });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/upload/qrcode", upload.single("qrcode"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      const fileUrl = `/uploads/${req.file.filename}`;
+      res.json({ url: fileUrl });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

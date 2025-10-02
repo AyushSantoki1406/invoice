@@ -1,14 +1,5 @@
 {
   "name": "client",
   "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-  "dev": "concurrently \"npm run server\" \"npm run client\"",
-  "server": "cross-env NODE_ENV=development tsx server/index.ts",
-  "client": "cd client && npm run dev"
-}
-,
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  "description": "Client package - dev script is for isolated testing only, not for normal development"
 }
