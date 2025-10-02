@@ -12,6 +12,7 @@ export async function setupVite(app: Express, server: any) {
     server: {
       middlewareMode: true,
       hmr: { server },
+      allowedHosts: [".repl.co", ".replit.dev", ".replit.app"],
     },
     appType: "custom",
     customLogger: createLogger(undefined, {
