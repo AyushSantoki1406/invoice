@@ -3,15 +3,16 @@ import { useParams } from "wouter";
 import { FileText, Save, FolderOpen } from "lucide-react";
 import InvoiceForm from "@/components/invoice-form";
 import InvoicePreview from "@/components/invoice-preview";
+import TemplateSelector from "@/components/template-selector";
 import { useInvoice } from "@/hooks/use-invoice";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
 
 export default function InvoiceCreator() {
   const params = useParams();
   const invoiceId = params.id;
   const { toast } = useToast();
+  const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
   
   const {
     invoiceData,
@@ -21,10 +22,6 @@ export default function InvoiceCreator() {
     isGeneratingPDF,
     isSaving
   } = useInvoice(invoiceId);
-
-  const { data: templates } = useQuery<any[]>({
-    queryKey: ["/api/templates"],
-  });
 
   const handleSaveTemplate = async () => {
     try {
@@ -53,23 +50,8 @@ export default function InvoiceCreator() {
     }
   };
 
-  const handleLoadTemplate = async () => {
-    if (!templates || templates.length === 0) {
-      toast({
-        title: "No Templates",
-        description: "No saved templates found",
-      });
-      return;
-    }
-
-    // For simplicity, load the first template. In a real app, show a selection dialog
-    const template = templates[0];
-    updateInvoiceData(template.templateData);
-    
-    toast({
-      title: "Success",
-      description: "Template loaded successfully",
-    });
+  const handleLoadTemplate = (templateData: any) => {
+    updateInvoiceData(templateData);
   };
 
   return (
@@ -93,8 +75,8 @@ export default function InvoiceCreator() {
               </Button>
               <Button
                 variant="ghost"
-                onClick={handleLoadTemplate}
-                disabled={!templates || templates.length === 0}
+                onClick={() => setTemplateDialogOpen(true)}
+                data-testid="button-load-template"
               >
                 <FolderOpen className="mr-2 h-4 w-4" />
                 Load Template
@@ -118,6 +100,12 @@ export default function InvoiceCreator() {
           <InvoicePreview data={invoiceData} />
         </div>
       </main>
+
+      <TemplateSelector
+        open={templateDialogOpen}
+        onOpenChange={setTemplateDialogOpen}
+        onSelectTemplate={handleLoadTemplate}
+      />
     </div>
   );
 }
