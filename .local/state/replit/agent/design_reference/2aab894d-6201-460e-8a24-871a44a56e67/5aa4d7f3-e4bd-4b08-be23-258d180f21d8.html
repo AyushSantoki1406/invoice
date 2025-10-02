@@ -1,0 +1,512 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Invoice Creator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#2563eb',
+                        'secondary': '#64748b',
+                        'success': '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-inter">
+    <!-- @COMPONENT: Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-file-invoice text-primary text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold text-gray-900">Invoice Creator Pro</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button data-event="click:saveTemplate" class="text-secondary hover:text-gray-900 transition-colors">
+                        <i class="fas fa-save mr-2"></i>Save Template
+                    </button>
+                    <button data-event="click:loadTemplate" class="text-secondary hover:text-gray-900 transition-colors">
+                        <i class="fas fa-folder-open mr-2"></i>Load Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: Header -->
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- @COMPONENT: InvoiceForm -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Create Invoice</h2>
+                
+                <!-- Company Details Section -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-building mr-2 text-primary"></i>
+                        Company Details
+                    </h3>
+                    
+                    <!-- Logo Upload -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Company Logo</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" data-implementation="File upload component">
+                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-sm text-gray-600">Click to upload logo or drag and drop</p>
+                            <p class="text-xs text-gray-400 mt-1">PNG, JPG up to 2MB</p>
+                            <input type="file" class="hidden" accept="image/*" data-mock="true">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Company Name *</label>
+                            <input type="text" placeholder="Your Company Name" data-bind="company.name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                            <input type="email" placeholder="company@example.com" data-bind="company.email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                        <textarea placeholder="Company Address" rows="3" data-bind="company.address" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true"></textarea>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                            <input type="tel" placeholder="+1 (555) 123-4567" data-bind="company.phone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                            <input type="url" placeholder="www.yourcompany.com" data-bind="company.website" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Details Section -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-file-alt mr-2 text-primary"></i>
+                        Invoice Details
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Invoice Number *</label>
+                            <input type="text" placeholder="INV-001" data-bind="invoice.number" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Issue Date *</label>
+                            <input type="date" data-bind="invoice.issueDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                            <input type="date" data-bind="invoice.dueDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Details Section -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-user mr-2 text-primary"></i>
+                        Bill To
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Client Name *</label>
+                            <input type="text" placeholder="Client Name" data-bind="client.name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" placeholder="client@example.com" data-bind="client.email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Client Address</label>
+                        <textarea placeholder="Client Address" rows="3" data-bind="client.address" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true"></textarea>
+                    </div>
+                </div>
+
+                <!-- Invoice Items Section -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-list mr-2 text-primary"></i>
+                        Invoice Items
+                    </h3>
+                    
+                    <!-- @MAP: items.map(item => ( -->
+                    <div class="border border-gray-200 rounded-lg p-4 mb-4" data-mock="true">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                            <div class="md:col-span-5">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                                <input type="text" placeholder="Service or product description" data-bind="item.description" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+                                <input type="number" placeholder="1" min="1" data-bind="item.quantity" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Rate</label>
+                                <input type="number" placeholder="0.00" step="0.01" data-bind="item.rate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+                                <input type="text" placeholder="0.00" readonly data-bind="item.amount" class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-600" data-mock="true">
+                            </div>
+                            <div class="md:col-span-1">
+                                <button class="text-red-600 hover:text-red-800 transition-colors p-2" data-event="click:removeItem">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- @END_MAP )) -->
+                    
+                    <button class="w-full border-2 border-dashed border-gray-300 rounded-lg p-4 text-gray-600 hover:border-primary hover:text-primary transition-colors" data-event="click:addItem">
+                        <i class="fas fa-plus mr-2"></i>Add Item
+                    </button>
+                </div>
+
+                <!-- Totals Section -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-calculator mr-2 text-primary"></i>
+                        Totals
+                    </h3>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Subtotal:</span>
+                            <span class="font-semibold" data-bind="totals.subtotal">$0.00</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <span class="text-gray-700 mr-2">Tax:</span>
+                                <input type="number" placeholder="0" min="0" max="100" step="0.1" data-bind="tax.rate" class="w-16 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary" data-mock="true">
+                                <span class="text-gray-700 ml-1">%</span>
+                            </div>
+                            <span class="font-semibold" data-bind="totals.tax">$0.00</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Discount:</span>
+                            <div class="flex items-center">
+                                <span class="text-gray-700 mr-1">$</span>
+                                <input type="number" placeholder="0.00" min="0" step="0.01" data-bind="discount.amount" class="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary" data-mock="true">
+                            </div>
+                        </div>
+                        
+                        <hr class="border-gray-300">
+                        
+                        <div class="flex justify-between items-center text-lg font-bold">
+                            <span class="text-gray-900">Total:</span>
+                            <span class="text-primary" data-bind="totals.final">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Details Section -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-credit-card mr-2 text-primary"></i>
+                        Payment Details
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Bank Account</label>
+                            <input type="text" placeholder="Account Number" data-bind="payment.bankAccount" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">IFSC Code</label>
+                            <input type="text" placeholder="IFSC Code" data-bind="payment.ifsc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">UPI ID</label>
+                            <input type="text" placeholder="yourname@upi" data-bind="payment.upiId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Payment Terms</label>
+                            <select data-bind="payment.terms" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                                <option>Net 30</option>
+                                <option>Net 15</option>
+                                <option>Due on Receipt</option>
+                                <option>Net 60</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Section -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-sticky-note mr-2 text-primary"></i>
+                        Additional Notes
+                    </h3>
+                    <textarea placeholder="Thank you for your business!" rows="3" data-bind="invoice.notes" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true"></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button class="flex-1 bg-primary text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors font-medium" data-event="click:generatePDF">
+                        <i class="fas fa-file-pdf mr-2"></i>Generate PDF
+                    </button>
+                    <button class="flex-1 bg-gray-200 text-gray-800 px-6 py-3 rounded-md hover:bg-gray-300 transition-colors font-medium" data-event="click:previewInvoice">
+                        <i class="fas fa-eye mr-2"></i>Preview
+                    </button>
+                    <button class="flex-1 bg-success text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors font-medium" data-event="click:sendEmail">
+                        <i class="fas fa-envelope mr-2"></i>Send Email
+                    </button>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: InvoiceForm -->
+
+            <!-- @COMPONENT: InvoicePreview -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Live Preview</h2>
+                    <div class="flex items-center space-x-2">
+                        <button class="text-gray-500 hover:text-gray-700 transition-colors" data-event="click:zoomOut">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <span class="text-sm text-gray-600">100%</span>
+                        <button class="text-gray-500 hover:text-gray-700 transition-colors" data-event="click:zoomIn">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Invoice Preview Content -->
+                <div class="border border-gray-300 rounded-lg p-6 bg-white" style="min-height: 800px; transform: scale(0.8); transform-origin: top left; width: 125%;">
+                    <!-- Invoice Header -->
+                    <div class="flex justify-between items-start mb-8">
+                        <div class="flex items-center">
+                            <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center mr-4" data-implementation="Logo will be displayed here">
+                                <i class="fas fa-building text-gray-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-2xl font-bold text-gray-900" data-bind="company.name">Your Company Name</h1>
+                                <p class="text-gray-600" data-bind="company.email">company@example.com</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <h1 class="text-3xl font-bold text-primary mb-2">INVOICE</h1>
+                            <p class="text-gray-600">Invoice #: <span data-bind="invoice.number" class="font-semibold">INV-001</span></p>
+                            <p class="text-gray-600">Date: <span data-bind="invoice.issueDate" class="font-semibold">2024-01-15</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Company & Client Info -->
+                    <div class="grid grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <h3 class="font-semibold text-gray-900 mb-2">From:</h3>
+                            <div class="text-gray-700">
+                                <p data-bind="company.name">Your Company Name</p>
+                                <p data-bind="company.address">123 Business Street<br>City, State 12345</p>
+                                <p data-bind="company.phone">+1 (555) 123-4567</p>
+                                <p data-bind="company.email">company@example.com</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Bill To:</h3>
+                            <div class="text-gray-700">
+                                <p data-bind="client.name">Client Name</p>
+                                <p data-bind="client.address">Client Address</p>
+                                <p data-bind="client.email">client@example.com</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Items Table -->
+                    <div class="mb-8">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b-2 border-gray-300">
+                                    <th class="text-left py-3 font-semibold text-gray-900">Description</th>
+                                    <th class="text-center py-3 font-semibold text-gray-900 w-20">Qty</th>
+                                    <th class="text-right py-3 font-semibold text-gray-900 w-24">Rate</th>
+                                    <th class="text-right py-3 font-semibold text-gray-900 w-24">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- @MAP: items.map(item => ( -->
+                                <tr class="border-b border-gray-200" data-mock="true">
+                                    <td class="py-3 text-gray-700" data-bind="item.description">Web Development Services</td>
+                                    <td class="py-3 text-center text-gray-700" data-bind="item.quantity">1</td>
+                                    <td class="py-3 text-right text-gray-700" data-bind="item.rate">$1,500.00</td>
+                                    <td class="py-3 text-right text-gray-700" data-bind="item.amount">$1,500.00</td>
+                                </tr>
+                                <tr class="border-b border-gray-200" data-mock="true">
+                                    <td class="py-3 text-gray-700">SEO Optimization</td>
+                                    <td class="py-3 text-center text-gray-700">1</td>
+                                    <td class="py-3 text-right text-gray-700">$500.00</td>
+                                    <td class="py-3 text-right text-gray-700">$500.00</td>
+                                </tr>
+                                <!-- @END_MAP )) -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Totals -->
+                    <div class="flex justify-end mb-8">
+                        <div class="w-64">
+                            <div class="flex justify-between py-2">
+                                <span class="text-gray-700">Subtotal:</span>
+                                <span data-bind="totals.subtotal">$2,000.00</span>
+                            </div>
+                            <div class="flex justify-between py-2">
+                                <span class="text-gray-700">Tax (10%):</span>
+                                <span data-bind="totals.tax">$200.00</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-t border-gray-300 font-bold text-lg">
+                                <span class="text-gray-900">Total:</span>
+                                <span class="text-primary" data-bind="totals.final">$2,200.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Details -->
+                    <div class="grid grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Payment Information:</h3>
+                            <div class="text-sm text-gray-700">
+                                <p>Bank: <span data-bind="payment.bankAccount">XXXX-XXXX-1234</span></p>
+                                <p>IFSC: <span data-bind="payment.ifsc">BANK0001234</span></p>
+                                <p>UPI: <span data-bind="payment.upiId">yourname@upi</span></p>
+                                <p>Terms: <span data-bind="payment.terms">Net 30</span></p>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900 mb-2">QR Code Payment:</h3>
+                            <div class="w-24 h-24 bg-gray-200 flex items-center justify-center rounded" data-implementation="QR code will be generated here">
+                                <i class="fas fa-qrcode text-gray-400 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="border-t border-gray-300 pt-4">
+                        <h3 class="font-semibold text-gray-900 mb-2">Notes:</h3>
+                        <p class="text-gray-700 text-sm" data-bind="invoice.notes">Thank you for your business! Payment is due within 30 days.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: InvoicePreview -->
+        </div>
+    </main>
+
+    <!-- @COMPONENT: LoadingModal -->
+    <div id="loadingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" data-implementation="Show during PDF generation">
+        <div class="bg-white rounded-lg p-6 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p class="text-gray-700">Generating PDF...</p>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: LoadingModal -->
+
+    <script>
+        // TODO: Implement business logic, API calls, or state management
+        
+        (function() {
+            // Form validation and calculations
+            const calculateTotals = () => {
+                // TODO: Implement automatic calculation of subtotal, tax, and total
+                console.log('Calculate invoice totals');
+            };
+
+            const addInvoiceItem = () => {
+                // TODO: Add new item row to invoice
+                console.log('Add new invoice item');
+            };
+
+            const removeInvoiceItem = (index) => {
+                // TODO: Remove item from invoice
+                console.log('Remove invoice item', index);
+            };
+
+            const generatePDF = () => {
+                // TODO: Generate PDF using library like jsPDF or Puppeteer
+                document.getElementById('loadingModal').classList.remove('hidden');
+                
+                setTimeout(() => {
+                    document.getElementById('loadingModal').classList.add('hidden');
+                    alert('PDF generated successfully!');
+                }, 2000);
+            };
+
+            const generateQRCode = (data) => {
+                // TODO: Generate QR code using QR code library
+                console.log('Generate QR code for payment', data);
+            };
+
+            const validateForm = () => {
+                // TODO: Validate required fields
+                console.log('Validate invoice form');
+                return true;
+            };
+
+            const saveTemplate = () => {
+                // TODO: Save invoice template to localStorage or server
+                console.log('Save invoice template');
+            };
+
+            const loadTemplate = () => {
+                // TODO: Load saved template
+                console.log('Load invoice template');
+            };
+
+            // Real-time preview updates
+            const updatePreview = () => {
+                // TODO: Update preview when form fields change
+                console.log('Update invoice preview');
+            };
+
+            // File upload handling
+            const handleLogoUpload = (file) => {
+                // TODO: Handle logo file upload and preview
+                console.log('Handle logo upload', file);
+            };
+
+            // Email functionality
+            const sendEmailInvoice = () => {
+                // TODO: Send invoice via email
+                console.log('Send invoice via email');
+            };
+
+            // Event listeners would be attached here
+            // Document ready initialization
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Invoice Creator initialized');
+                
+                // Set current date as default
+                const today = new Date().toISOString().split('T')[0];
+                const issueDateInput = document.querySelector('input[type="date"]');
+                if (issueDateInput) {
+                    issueDateInput.value = today;
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
