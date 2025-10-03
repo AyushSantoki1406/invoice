@@ -5,6 +5,7 @@ import { setupVite, serveStatic } from "./vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import { connectDB } from "./db";
+import cors from "cors";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,6 +14,15 @@ const server = createServer(app);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// CORS for Netlify frontend
+const allowedOrigin = process.env.NETLIFY_ORIGIN || process.env.FRONTEND_URL;
+app.use(
+  cors({
+    origin: allowedOrigin ? [allowedOrigin] : true,
+    credentials: true,
+  })
+);
 
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 

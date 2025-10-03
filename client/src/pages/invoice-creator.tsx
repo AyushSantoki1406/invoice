@@ -7,20 +7,21 @@ import TemplateSelector from "@/components/template-selector";
 import { useInvoice } from "@/hooks/use-invoice";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function InvoiceCreator() {
   const params = useParams();
   const invoiceId = params.id;
   const { toast } = useToast();
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
-  
+
   const {
     invoiceData,
     updateInvoiceData,
     saveInvoice,
     generatePDF,
     isGeneratingPDF,
-    isSaving
+    isSaving,
   } = useInvoice(invoiceId);
 
   const handleSaveTemplate = async () => {
@@ -28,13 +29,9 @@ export default function InvoiceCreator() {
       const templateName = prompt("Enter template name:");
       if (!templateName) return;
 
-      await fetch("/api/templates", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: templateName,
-          templateData: invoiceData
-        }),
+      await apiRequest("POST", "/api/templates", {
+        name: templateName,
+        templateData: invoiceData,
       });
 
       toast({
@@ -62,7 +59,9 @@ export default function InvoiceCreator() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <FileText className="text-primary text-2xl mr-3" />
-              <h1 className="text-xl font-bold text-gray-900">Invoice Creator Pro</h1>
+              <h1 className="text-xl font-bold text-gray-900">
+                Invoice Creator Pro
+              </h1>
             </div>
             <div className="flex items-center space-x-4">
               <Button

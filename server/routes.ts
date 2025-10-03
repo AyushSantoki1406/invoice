@@ -136,6 +136,7 @@ export function registerRoutes(app: Express) {
 
   app.post("/api/upload/logo", upload.single("logo"), async (req, res) => {
     try {
+      console.log("file", req.file);
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
@@ -148,6 +149,7 @@ export function registerRoutes(app: Express) {
 
   app.post("/api/upload/qrcode", upload.single("qrcode"), async (req, res) => {
     try {
+      console.log("file", req.file);
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
