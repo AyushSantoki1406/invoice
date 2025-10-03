@@ -4,6 +4,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import path from "path";
 import { fileURLToPath } from "url";
+import { connectDB } from "./db";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -46,6 +47,8 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  await connectDB();
+  
   registerRoutes(app);
 
   const isDev = process.env.NODE_ENV !== "production";
