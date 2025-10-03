@@ -32,7 +32,7 @@ export function registerRoutes(app: Express) {
 
   app.get("/api/invoices/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const invoice = await storage.getInvoiceById(id);
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
@@ -58,7 +58,7 @@ export function registerRoutes(app: Express) {
 
   app.patch("/api/invoices/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const data = insertInvoiceSchema.partial().parse(req.body);
       const invoice = await storage.updateInvoice(id, data);
       if (!invoice) {
@@ -75,7 +75,7 @@ export function registerRoutes(app: Express) {
 
   app.delete("/api/invoices/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const deleted = await storage.deleteInvoice(id);
       if (!deleted) {
         return res.status(404).json({ message: "Invoice not found" });
@@ -100,7 +100,7 @@ export function registerRoutes(app: Express) {
 
   app.get("/api/templates/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const template = await storage.getTemplateById(id);
             console.log("templates",template,id)
 
@@ -128,7 +128,7 @@ export function registerRoutes(app: Express) {
 
   app.delete("/api/templates/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const deleted = await storage.deleteTemplate(id);
       if (!deleted) {
         return res.status(404).json({ message: "Template not found" });

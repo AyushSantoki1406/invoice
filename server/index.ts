@@ -4,9 +4,14 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import path from "path";
 import { fileURLToPath } from "url";
+<<<<<<< HEAD
 import dotenv from "dotenv";
 dotenv.config(); // must be called before using process.env
 
+||||||| 6bff6ef
+=======
+import { connectDB } from "./db";
+>>>>>>> dd2af72b3450135c0f1ff961dd61fb60de26814d
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -49,6 +54,8 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  await connectDB();
+  
   registerRoutes(app);
 
   const isDev = process.env.NODE_ENV !== "production";

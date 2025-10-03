@@ -1,8 +1,19 @@
 {
   "name": "client",
   "version": "1.0.0",
+<<<<<<< HEAD
   "scripts": {
     "dev": "echo 'Client integrated with server' && exit 0"
   },
   "description": "Client package"
 }
+||||||| 6bff6ef
+  "description": "Client package - dev script is for isolated testing only, not for normal development"
+}
+=======
+  "scripts": {
+    "dev": "echo 'Client integrated with server' && exit 0"
+  },
+  "description": "Client package"
+}
+>>>>>>> dd2af72b3450135c0f1ff961dd61fb60de26814d

@@ -1,80 +1,117 @@
 import type { Invoice, InsertInvoice, InvoiceTemplate, InsertTemplate } from "@shared/schema";
+<<<<<<< HEAD
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { invoices, invoiceTemplates } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import ws from "ws";
 import dotenv from "dotenv";
 dotenv.config(); // must be called before using process.env
+||||||| 6bff6ef
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { invoices, invoiceTemplates } from "@shared/schema";
+import { eq } from "drizzle-orm";
+import ws from "ws";
+=======
+import { InvoiceModel, TemplateModel } from "./db";
+>>>>>>> dd2af72b3450135c0f1ff961dd61fb60de26814d
 
 export interface IStorage {
   getInvoices(): Promise<Invoice[]>;
-  getInvoiceById(id: number): Promise<Invoice | undefined>;
+  getInvoiceById(id: string): Promise<Invoice | undefined>;
   createInvoice(invoice: InsertInvoice): Promise<Invoice>;
-  updateInvoice(id: number, invoice: Partial<InsertInvoice>): Promise<Invoice | undefined>;
-  deleteInvoice(id: number): Promise<boolean>;
+  updateInvoice(id: string, invoice: Partial<InsertInvoice>): Promise<Invoice | undefined>;
+  deleteInvoice(id: string): Promise<boolean>;
 
   getTemplates(): Promise<InvoiceTemplate[]>;
-  getTemplateById(id: number): Promise<InvoiceTemplate | undefined>;
+  getTemplateById(id: string): Promise<InvoiceTemplate | undefined>;
   createTemplate(template: InsertTemplate): Promise<InvoiceTemplate>;
-  deleteTemplate(id: number): Promise<boolean>;
+  deleteTemplate(id: string): Promise<boolean>;
 }
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is not set");
-}
-
-const db = drizzle({
-  connection: process.env.DATABASE_URL,
-  ws: ws,
-});
-
-export class DatabaseStorage implements IStorage {
+export class MongoDBStorage implements IStorage {
   async getInvoices(): Promise<Invoice[]> {
-    return await db.select().from(invoices);
+    const invoices = await InvoiceModel.find().sort({ createdAt: -1 }).lean();
+    return invoices.map((invoice) => ({
+      ...invoice,
+      id: invoice._id.toString(),
+      _id: invoice._id.toString(),
+    }));
   }
 
-  async getInvoiceById(id: number): Promise<Invoice | undefined> {
-    const result = await db.select().from(invoices).where(eq(invoices.id, id));
-    return result[0];
+  async getInvoiceById(id: string): Promise<Invoice | undefined> {
+    const invoice = await InvoiceModel.findById(id).lean();
+    if (!invoice) return undefined;
+    return {
+      ...invoice,
+      id: invoice._id.toString(),
+      _id: invoice._id.toString(),
+    };
   }
 
   async createInvoice(invoice: InsertInvoice): Promise<Invoice> {
-    const result = await db.insert(invoices).values(invoice).returning();
-    return result[0];
+    const newInvoice = await InvoiceModel.create(invoice);
+    const savedInvoice = await newInvoice.save();
+    return {
+      ...savedInvoice.toObject(),
+      id: savedInvoice._id.toString(),
+      _id: savedInvoice._id.toString(),
+    };
   }
 
-  async updateInvoice(id: number, invoice: Partial<InsertInvoice>): Promise<Invoice | undefined> {
-    const result = await db
-      .update(invoices)
-      .set(invoice)
-      .where(eq(invoices.id, id))
-      .returning();
-    return result[0];
+  async updateInvoice(id: string, invoice: Partial<InsertInvoice>): Promise<Invoice | undefined> {
+    const updatedInvoice = await InvoiceModel.findByIdAndUpdate(
+      id,
+      { $set: invoice },
+      { new: true }
+    ).lean();
+    
+    if (!updatedInvoice) return undefined;
+    
+    return {
+      ...updatedInvoice,
+      id: updatedInvoice._id.toString(),
+      _id: updatedInvoice._id.toString(),
+    };
   }
 
-  async deleteInvoice(id: number): Promise<boolean> {
-    const result = await db.delete(invoices).where(eq(invoices.id, id)).returning();
-    return result.length > 0;
+  async deleteInvoice(id: string): Promise<boolean> {
+    const result = await InvoiceModel.findByIdAndDelete(id);
+    return result !== null;
   }
 
   async getTemplates(): Promise<InvoiceTemplate[]> {
-    return await db.select().from(invoiceTemplates);
+    const templates = await TemplateModel.find().sort({ createdAt: -1 }).lean();
+    return templates.map((template) => ({
+      ...template,
+      id: template._id.toString(),
+      _id: template._id.toString(),
+    }));
   }
 
-  async getTemplateById(id: number): Promise<InvoiceTemplate | undefined> {
-    const result = await db.select().from(invoiceTemplates).where(eq(invoiceTemplates.id, id));
-    return result[0];
+  async getTemplateById(id: string): Promise<InvoiceTemplate | undefined> {
+    const template = await TemplateModel.findById(id).lean();
+    if (!template) return undefined;
+    return {
+      ...template,
+      id: template._id.toString(),
+      _id: template._id.toString(),
+    };
   }
 
   async createTemplate(template: InsertTemplate): Promise<InvoiceTemplate> {
-    const result = await db.insert(invoiceTemplates).values(template).returning();
-    return result[0];
+    const newTemplate = await TemplateModel.create(template);
+    const savedTemplate = await newTemplate.save();
+    return {
+      ...savedTemplate.toObject(),
+      id: savedTemplate._id.toString(),
+      _id: savedTemplate._id.toString(),
+    };
   }
 
-  async deleteTemplate(id: number): Promise<boolean> {
-    const result = await db.delete(invoiceTemplates).where(eq(invoiceTemplates.id, id)).returning();
-    return result.length > 0;
+  async deleteTemplate(id: string): Promise<boolean> {
+    const result = await TemplateModel.findByIdAndDelete(id);
+    return result !== null;
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new MongoDBStorage();
