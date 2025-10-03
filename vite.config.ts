@@ -33,6 +33,6 @@ export default defineConfig({
     strict: true,
     deny: ["**/.*"],
   },
-  allowedHosts: true, // <--- Use true instead of "all"
+  allowedHosts: ["invoice-2-tibx.onrender.com"], // <--- Use true instead of "all"
 },
 });
