@@ -86,19 +86,24 @@ export function registerRoutes(app: Express) {
     }
   });
 
-  app.get("/api/templates", async (_req, res) => {
-    try {
-      const templates = await storage.getTemplates();
-      res.json(templates);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
+ app.get("/api/templates", async (_req, res) => {
+  try {
+    const templates = await storage.getTemplates();
+    console.log("templates", templates);
+    res.json(templates);
+  } catch (error: any) {
+    console.error("Error fetching templates:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
   app.get("/api/templates/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const template = await storage.getTemplateById(id);
+            console.log("templates",template,id)
+
       if (!template) {
         return res.status(404).json({ message: "Template not found" });
       }

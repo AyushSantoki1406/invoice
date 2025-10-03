@@ -4,6 +4,9 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import path from "path";
 import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+dotenv.config(); // must be called before using process.env
+
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

@@ -3,6 +3,8 @@ import { drizzle } from "drizzle-orm/neon-serverless";
 import { invoices, invoiceTemplates } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import ws from "ws";
+import dotenv from "dotenv";
+dotenv.config(); // must be called before using process.env
 
 export interface IStorage {
   getInvoices(): Promise<Invoice[]>;
